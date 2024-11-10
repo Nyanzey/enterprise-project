@@ -8,3 +8,6 @@ numpy
 pytesseract
 pdf2image
 boto3
+bs4
+os
+requests

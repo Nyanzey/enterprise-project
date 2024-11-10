@@ -16,7 +16,7 @@ IN_DIR = './input'
 OUT_DIR =  './output'
 
 # Web media directory
-WEB_DIR = None
+UPLOAD_WEB = True
 
 # Metadata directory
 META_DIR = './meta'
@@ -51,8 +51,8 @@ def extract_meta(meta_format = '.json'):
 
 def backup():
     # Upload to website (should put the output in paperless media folder)
-    if WEB_DIR:
-        dmanage.upload_to_web(OUT_DIR, WEB_DIR)
+    if UPLOAD_WEB:
+        dmanage.upload_to_web(OUT_DIR)
 
     # Back up to local dir
     if BACKUP_DIR:

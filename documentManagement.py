@@ -5,6 +5,8 @@ import csv
 import boto3
 import logging
 from botocore.exceptions import ClientError
+import requests
+from bs4 import BeautifulSoup
 
 AWS_S3_BUCKET_NAME = 'docmanager-backup'
 AWS_REGION = 'us-east-1'
@@ -85,9 +87,66 @@ def output_metadata(source_path, dest_path, doc_type, keywords, similarity_score
     print(f"Metadata for '{source_name}' saved successfully in {dest_path}")
 
 
-def upload_to_web(src_folder, web_media_folder):
-    # to do ....
-    pass
+def upload_to_web(src_folder):
+    # Start a session
+    session = requests.Session()
+    
+    # Step 1: Get the login page to retrieve the CSRF token
+    login_page_url = "http://127.0.0.1:8000/accounts/login/?next=/"
+    login_page_response = session.get(login_page_url)
+    
+    if login_page_response.status_code != 200:
+        print("Failed to load login page.")
+        return
+
+    # Parse the HTML to find the CSRF token
+    soup = BeautifulSoup(login_page_response.text, 'html.parser')
+    csrf_token = soup.find("input", {"name": "csrfmiddlewaretoken"})["value"]
+
+    # Step 2: Prepare login data with the CSRF token
+    login_data = {
+        "csrfmiddlewaretoken": csrf_token,
+        "login": "admin",  # replace with actual username
+        "password": "admin"  # replace with actual password
+    }
+
+    # Set headers as per the request structure
+    headers = {
+        "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Referer": login_page_url,
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Origin": "http://127.0.0.1:8000",
+        "Upgrade-Insecure-Requests": "1",
+    }
+
+    # Step 3: Send the login POST request
+    login_response = session.post(login_page_url, data=login_data, headers=headers)
+    if login_response.status_code == 200 and "sessionid" in session.cookies:
+        print("Login successful.")
+
+        # Set headers for file upload
+        post_url = "http://127.0.0.1:8000/api/documents/post_document/"
+        headers["X-CSRFToken"] = session.cookies.get("csrftoken")
+        headers["Accept"] = "application/json; version=5"
+        headers.pop("Content-Type", None)  # Remove Content-Type for multipart/form-data
+
+        # Step 4: Upload each file in the folder
+        for filename in os.listdir(src_folder):
+            file_path = os.path.join(src_folder, filename)
+            if os.path.isfile(file_path):  # Ensure it's a file
+                with open(file_path, "rb") as file:
+                    files = {"document": (filename, file)}
+                    response = session.post(post_url, headers=headers, files=files)
+                    print(f"Uploaded {filename}: Status Code {response.status_code}")
+                    if response.status_code == 200:
+                        print("Response:", response.json())
+                    else:
+                        print(f"Failed to upload {filename}")
+    else:
+        print("Login failed with status code:", login_response.status_code)
 
 
 def copy_to_remote(src_folder, remote_folder):
