@@ -2,3 +2,5 @@ test/
 input/*
 output/*
 meta/*
+awsSecretKey.txt
+awsKey.txt

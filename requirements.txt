@@ -7,3 +7,4 @@ sentence-transformers
 numpy
 pytesseract
 pdf2image
+boto3

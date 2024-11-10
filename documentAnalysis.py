@@ -70,62 +70,6 @@ def classify_document_by_keywords(keywords):
     best_category = max(similarities, key=similarities.get)
     return best_category, similarities
 
-def predict_document_type(keywords):
-    # Define a simple rule-based prediction based on keyword presence
-    keyword_to_category = {
-        'factura': 'Documento Financiero',
-        'recibo': 'Documento Financiero',
-        'contrato': 'Documento Legal',
-        'acuerdo': 'Documento Legal',
-        'carta': 'Carta Formal',
-        'solicitud': 'Solicitud o Petición',
-        'resumen': 'Resumen Ejecutivo',
-        'análisis': 'Informe de Análisis',
-        'ensayo': 'Documento Académico',
-        'datos': 'Ensayo o Reporte',
-        'investigación': 'Documento Académico',
-        'tesis': 'Tesis Académica',
-        'propuesta': 'Propuesta de Negocios',
-        'informe': 'Informe General',
-        'balance': 'Reporte Financiero',
-        'plan': 'Plan de Proyecto',
-        'proyecto': 'Documento de Proyecto',
-        'presentación': 'Presentación',
-        'acta': 'Acta de Reunión',
-        'política': 'Documento Político o Normativo',
-        'normativa': 'Documento Normativo',
-        'guía': 'Guía o Manual',
-        'manual': 'Guía o Manual',
-        'catálogo': 'Catálogo de Productos',
-        'licencia': 'Documento de Licencia',
-        'certificado': 'Certificado',
-        'curriculum': 'Curriculum Vitae',
-        'hoja de vida': 'Curriculum Vitae',
-        'pedido': 'Orden de Compra',
-        'orden de compra': 'Orden de Compra',
-        'presupuesto': 'Presupuesto',
-        'agenda': 'Agenda de Reunión',
-        'estrategia': 'Plan Estratégico',
-        'membresía': 'Formulario de Membresía',
-        'evaluación': 'Informe de Evaluación',
-        'diagnóstico': 'Informe de Diagnóstico',
-        'política de privacidad': 'Política de Privacidad',
-        'términos y condiciones': 'Términos y Condiciones',
-        'anuncio': 'Anuncio',
-        'boletín': 'Boletín Informativo',
-        'invitación': 'Invitación',
-        'encuesta': 'Encuesta',
-        'cuestionario': 'Cuestionario',
-        'protocolo': 'Protocolo',
-        'estrategia de marketing': 'Plan de Marketing',
-        'campaña': 'Campaña Publicitaria',
-        'reporte anual': 'Reporte Anual',
-    }
-    for keyword in keywords:
-        if keyword in keyword_to_category:
-            return keyword_to_category[keyword]
-    return 'Unknown Document Type'
-
 # Main Function
 def analyze_pdf_document(pdf_path):
     # Extract and clean text

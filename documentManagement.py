@@ -2,6 +2,20 @@ import os
 import shutil
 import json
 import csv
+import boto3
+import logging
+from botocore.exceptions import ClientError
+
+AWS_S3_BUCKET_NAME = 'docmanager-backup'
+AWS_REGION = 'us-east-1'
+AWS_ACCESS_KEY = None
+AWS_SECRET_KEY = None
+
+with open('./awsKey.txt', 'r') as f:
+    AWS_ACCESS_KEY = f.read()
+
+with open('./awsSecretKey.txt', 'r') as f:
+    AWS_SECRET_KEY = f.read()
 
 def copy_to_local(src_folder, dst_folder):
     # Ensure the destination folder exists
@@ -75,6 +89,29 @@ def upload_to_web(src_folder, web_media_folder):
     # to do ....
     pass
 
-def copy_to_remote(src_folder, remote_addr):
-    # to do ....
-    pass
+
+def copy_to_remote(src_folder, remote_folder):
+    s3_client = boto3.client(
+        service_name='s3',
+        region_name=AWS_REGION,
+        aws_access_key_id=AWS_ACCESS_KEY,
+        aws_secret_access_key=AWS_SECRET_KEY
+    )
+
+    for root, dirs, files in os.walk(src_folder):
+        for file in files:
+            local_file_path = os.path.join(root, file)
+            # Construct the remote file path in S3
+            remote_file_path = os.path.join(remote_folder, file)
+            print(local_file_path,' -> ', remote_file_path)
+            sup = input('Upload ? [y/n]: ')
+            if sup != 'y':
+                continue
+            try:
+                response = s3_client.upload_file(local_file_path, AWS_S3_BUCKET_NAME, remote_file_path)
+            except ClientError as e:
+                logging.error(f"Error uploading {local_file_path}: {e}")
+                return False
+            
+    print('Files uploaded to remote backup successfully')
+    return True

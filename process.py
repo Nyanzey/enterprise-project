@@ -7,7 +7,7 @@ import os
 BACKUP_DIR = None
 
 # Remote back up folder
-REMOTE_BACKUP_ADDR = None
+REMOTE_BACKUP_ADDR = 'backup/'
 
 # Input directory
 IN_DIR = './input'
@@ -56,7 +56,7 @@ def backup():
 
     # Back up to local dir
     if BACKUP_DIR:
-        dmanage.copy_files(OUT_DIR, BACKUP_DIR)
+        dmanage.copy_to_local(OUT_DIR, BACKUP_DIR)
 
     # Back up to remote addr (maybe like s3)
     if REMOTE_BACKUP_ADDR:
